@@ -22,6 +22,13 @@ StartCoroutine(IECollect(CollectCapacity, collectTime));
     {
         yield return new WaitForSeconds(collectTime);
         CurrentGold = collectGold;
+        ChangeGoal();
         MoveMiner(shaftDepositLocation.position);
+    }
+    protected override void DepositGold()
+    {
+        CurrentGold = 0;
+        ChangeGoal();
+        MoveMiner(shaftMiningLocation.position);
     }
 }
