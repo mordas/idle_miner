@@ -4,31 +4,35 @@ using UnityEngine;
 
 public class ShaftMiner : BaseMiner
 {
-    [SerializeField] private Transform shaftMiningLocation;
-    [SerializeField] private Transform shaftDepositLocation;
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.M))
-        {
-            MoveMiner(shaftMiningLocation.position);
-        }
-    }
+    public Shaft CurrentShaft { get; set; }
+    private int miningAnimatioParametor = Animator.StringToHash("Mining");
+    private int walkingAnimatioParametor = Animator.StringToHash("Walking");
+
     protected override void CollectGold()
     {
         float collectTime = CollectCapacity / CollectPerSecond;
-StartCoroutine(IECollect(CollectCapacity, collectTime));
+        _animator.SetTrigger(miningAnimatioParametor);
+        StartCoroutine(IECollect(CollectCapacity, collectTime));
     }
     protected override IEnumerator IECollect(int collectGold, float collectTime)
     {
         yield return new WaitForSeconds(collectTime);
         CurrentGold = collectGold;
         ChangeGoal();
-        MoveMiner(shaftDepositLocation.position);
+        RotateMiner(-1);
+        MoveMiner(CurrentShaft.DepositLocation.position);
     }
     protected override void DepositGold()
     {
+        CurrentShaft.CurrentDeposit.DepositGold(CurrentGold);
         CurrentGold = 0;
         ChangeGoal();
-        MoveMiner(shaftMiningLocation.position);
+        RotateMiner(1);
+        MoveMiner(CurrentShaft.MiningLocation.position);
+    }
+    public override void MoveMiner(Vector3 newPosition)
+    {
+        base.MoveMiner(newPosition);
+        _animator.SetTrigger(walkingAnimatioParametor);
     }
 }
